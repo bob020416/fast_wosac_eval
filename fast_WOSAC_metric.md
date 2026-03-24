@@ -27,7 +27,7 @@ def compute_scenario_metrics_for_bundle(
 
 * We batch multiple rollouts of the same scenario together to maximize GPU utilization.
 
-* We optimized the computational logic for map_metric (offroad_indication_likelihood, simulated_offroad_rate, traffic_light_violation_likelihood, simulated_traffic_light_violation_rate). Map polylines are segmented into equal lengths, and a hierarchical search is employed to accelerate the spatial query for the nearest polyline to the agents, significantly reducing VRAM consumption.
+* We optimized the computational logic for map_metric (offroad_indication_likelihood, simulated_offroad_rate, traffic_light_violation_likelihood, simulated_traffic_light_violation_rate). Map polylines are segmented into equal lengths, and a hierarchical search is employed to accelerate the spatial query for the nearest polyline to the agents while reducing memory consumption.
 
 * We implemented seamless switching between the 2024 and 2025 versions of the WOSAC metrics.
 
