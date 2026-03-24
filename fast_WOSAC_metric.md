@@ -2,7 +2,7 @@
 
 This tool is an unofficial implementation of the WOSAC Metric evaluator, designed for rapid model testing and iteration.
 
-### 使用方法：
+### Usage：
 
 The primary function for computing metrics is `wosac_fast_eval_tool.fast_sim_agents_metrics.compute_scenario_metrics_for_bundle`: 
 
