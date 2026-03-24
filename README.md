@@ -5,7 +5,7 @@
 
 >Official implementation of paper [TrajTok: What makes for a good trajectory tokenizer in behavior generation?](https://openreview.net/pdf?id=Zvy2agYouY). *Zhiyuan Zhang, Xiaosong Jia, Guanyu Chen, Qifeng Li, Zuxuan Wu, Yu-Gang Jiang, Junchi Yan*. **ICLR 2026**
 
-**First Place of [Waymo Open Sim Agents Challenge 2025](https://waymo.com/open/challenges/) 🏆** 
+## **First Place of [Waymo Open Sim Agents Challenge 2025](https://waymo.com/open/challenges/) 🏆** 
 
 ![rank](./assets/rank.png)
 
@@ -35,6 +35,7 @@ pip install --no-deps waymo-open-dataset-tf-2-12-0==1.6.4
 ## Data Preparation
 
 Step1. Download [Waymo Open Motion Dataset](https://waymo.com/open/download/) v1.3.0.
+
 Step2. run data preprocess script.
 
 ```bash
