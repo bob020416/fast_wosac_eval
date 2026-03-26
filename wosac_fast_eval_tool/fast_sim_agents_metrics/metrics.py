@@ -198,15 +198,16 @@ def compute_scenario_metrics_for_bundle(
     simulated_offroad_rate = torch.sum(
             sim_offroad_indication.to(torch.int32)
     ) / torch.sum(torch.ones_like(sim_offroad_indication, dtype=torch.int32))
-    device = sim_features['traffic_light_violation_per_step'].device
-    mask = valid_masks.to(device)
-    traffic_light_violation_indication = torch.any(
-        sim_features['traffic_light_violation_per_step'] & mask.unsqueeze(0), dim=2)
-    traffic_light_violation_rate = torch.sum(
-        traffic_light_violation_indication.int()
-        ) / torch.sum(
-        torch.ones_like(traffic_light_violation_indication, dtype=torch.int32)
-        )
+    if version == '2025':
+        device = sim_features['traffic_light_violation_per_step'].device
+        mask = valid_masks.to(device)
+        traffic_light_violation_indication = torch.any(
+            sim_features['traffic_light_violation_per_step'] & mask.unsqueeze(0), dim=2)
+        traffic_light_violation_rate = torch.sum(
+            traffic_light_violation_indication.int()
+            ) / torch.sum(
+            torch.ones_like(traffic_light_violation_indication, dtype=torch.int32)
+            )
     # ==== Meta-metric ====
 
     likelihood_metrics = {
@@ -232,8 +233,9 @@ def compute_scenario_metrics_for_bundle(
             'min_average_displacement_error': min_average_displacement_error.item(),
             'simulated_collision_rate': simulated_collision_rate.item(),
             'simulated_offroad_rate': simulated_offroad_rate.item(),
-            'simulated_traffic_light_violation_rate': traffic_light_violation_rate.item(),
     })
+    if version == '2025':
+        likelihood_metrics['simulated_traffic_light_violation_rate'] = traffic_light_violation_rate.item()
     
     return likelihood_metrics
 
@@ -310,7 +312,10 @@ def _compute_metametric(
 ):
     """Computes the meta-metric aggregation."""
     metametric = 0.0
+    available_fields = config.DESCRIPTOR.fields_by_name
     for field_name in _METRIC_FIELD_NAMES:
+        if field_name not in available_fields:
+            continue
         likelihood_field_name = field_name + '_likelihood'
         weight = getattr(config, field_name).metametric_weight
         metric_score = getattr(metrics, likelihood_field_name)

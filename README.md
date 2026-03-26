@@ -1,77 +1,64 @@
-<div align="center">   
+# wosac_eval
 
-# TrajTok: What makes for a good trajectory tokenizer in behavior generation?
-</div>
+Minimal offline WOSAC evaluation project extracted from TrajTok.
 
->Official implementation of paper [TrajTok: What makes for a good trajectory tokenizer in behavior generation?](https://openreview.net/pdf?id=Zvy2agYouY). *Zhiyuan Zhang, Xiaosong Jia, Guanyu Chen, Qifeng Li, Zuxuan Wu, Yu-Gang Jiang, Junchi Yan*. **ICLR 2026**
+## What It Does
 
-## **First Place of [Waymo Open Sim Agents Challenge 2025](https://waymo.com/open/challenges/) 🏆** 
+This project is focused on two tasks only:
 
-![rank](./assets/rank.png)
+1. Build GT pickle files for Waymo validation scenarios.
+2. Evaluate rollout pickle files offline with the fast WOSAC metric implementation.
 
+## Expected Rollout Format
 
-![rank](./assets/sim.png)
+Each rollout file must be named as `<scenario_id>.pkl` and contain:
 
-## Fast WOSAC Metric 🚀
+- `agent_id`: shape `[n_agents]`
+- `simulated_states`: shape `[n_rollout, n_agents, n_step, 4]`
 
-It is **very slow** to compute the WOSAC metrics with the official code. It usually takes 10-30 seconds to evaluate a single scenario and 100+ hours on the whole validation set. ([here are issues](https://github.com/waymo-research/waymo-open-dataset/issues/877))
+The last dimension of `simulated_states` must be `(x, y, z, yaw)` in global coordinates.
 
-For **fast evaluation and quick development**, we developed the **fast WOSAC metric** that reduces the time to about **0.4s/scenario** while maintain the error of each indicator from the official less than $10^{-6}$. The tool supports both **2024 and 2025 version** of WOSAC metric and is easy to use in both **online and offline** modes.
-
-Please refer the [document](fast_WOSAC_metric.md) for more information.
-
-## Environment Setup
+## Install
 
 ```bash
-conda create -y -n trajtok python=3.11.9
-conda activate trajtok
-conda install -y -c conda-forge ffmpeg=4.3.2
+conda create -y -n wosac_eval python=3.11.9
+conda activate wosac_eval
 pip install -r requirements.txt
-pip install torch_geometric
-pip install torch_scatter torch_cluster -f https://data.pyg.org/whl/torch-2.4.0+cu121.html
 pip install --no-deps waymo-open-dataset-tf-2-12-0==1.6.4
 ```
 
-## Data Preparation
-
-Step1. Download [Waymo Open Motion Dataset](https://waymo.com/open/download/) v1.3.0.
-
-Step2. run data preprocess script.
+## Prepare GT Pickles
 
 ```bash
-# set INPUT_DIR as your dataset path (.../scenario/) before running
-bash data_preprocess.sh
+python prepare_gt.py /path/to/waymo/scenario/validation --output-dir data/waymo_processed/validation_gt
 ```
 
-## Train
+This writes one GT pickle per scenario into the output directory.
+
+## Evaluate Rollouts Offline
 
 ```bash
-python run.py experiment=train task_name=train
+python wosac_eval.py /path/to/rollout_dir --gt-dir data/waymo_processed/validation_gt --version 2025
 ```
 
-## Evaluation
+This writes a JSON report to:
 
 ```bash
-python run.py experiment=inference task_name=eval
+/path/to/rollout_dir/wosac_metrics_report.json
 ```
 
-## Tokenization
+You can also point it at an external rollout directory, for example:
 
 ```bash
-python -m src.smart.tokens.trajtok
+python wosac_eval.py /home/hcis-s26/Yuhsiang/catk/vis/catk_sketch_1000 --gt-dir data/waymo_processed/validation_gt --version 2025
 ```
 
-## Citation
+## Output Report
 
-```
-@inproceedings{zhang2026trajtok,
-  title={TrajTok: What makes for a good trajectory tokenizer in behavior generation?},
-  author={Zhiyuan Zhang and Xiaosong Jia and Guanyu Chen and Qifeng Li and Zuxuan Wu and Yu-Gang Jiang and Junchi Yan},
-  booktitle={International Conference on Learning Representations (ICLR)},
-  year={2026}
-}
-```
+The JSON report includes:
 
-## Acknowledgement
-
-Thansk for these excellent opensource works and models: [SMART](https://github.com/rainmaker22/SMART) [CatK](https://github.com/NVlabs/catk).
+- aggregate metrics
+- number of matched files
+- failed files with error messages
+- files missing GT
+- files missing rollout
