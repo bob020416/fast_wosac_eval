@@ -24,7 +24,7 @@ The last dimension of `simulated_states` must be `(x, y, z, yaw)` in global coor
 conda create -y -n wosac_eval python=3.11.9
 conda activate wosac_eval
 pip install -r requirements.txt
-pip install --no-deps waymo-open-dataset-tf-2-12-0==1.6.4
+pip install --no-deps waymo-open-dataset-tf-2-12-0==1.6.7
 ```
 
 ## Prepare GT Pickles
